@@ -1,153 +1,106 @@
 import { connectMongoRecipies } from "@/utils";
 import { Recipie } from "@/models";
-import { recipie } from "@/interfaces"
+import { recipieBody, describeIssues } from "@/interfaces/zServer"
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import { writeFile, unlink } from "fs/promises";
+import { isValidObjectId } from "mongoose";
+import { writeFile } from "fs/promises";
+import { z } from "zod";
+import { imagePath, removeImageIfUnused } from "@/utils/uploads";
 
-const uploadDir = path.join(process.cwd(), 'uploads');
+type RecipieBody = z.infer<typeof recipieBody>
 
-export const config = {
-    api: {
-        bodyParser: false
-    }
-}
-
+const badRequest = (error: string) => NextResponse.json({ error }, { status: 400 })
+const notFound = () => NextResponse.json({ error: 'Recipe not found' }, { status: 404 })
 
 export async function POST(req: NextRequest) {
     try {
-        const contentType = req.headers.get('content-type')
-        let data: any
-        
-        if (contentType && contentType.includes('multipart/form-data')) {
+        const contentType = req.headers.get('content-type') ?? ''
+
+        if (contentType.includes('multipart/form-data')) {
             const formData = await req.formData();
-            const file: File | null = formData.get('image') as unknown as File
-            const action = formData.get('action') as unknown as string
-            const recipieRaw = formData.get('recipie') as unknown as string
-            const oldImage = formData.get('oldImageLocaltion') as unknown as string
-            const recipie = recipieRaw ? recipieRaw : '{}'
-            
-            console.log('action:', action, 'recipie:', recipie, 'file:', file)
-            
-            if (!action || !recipie) {
-                return NextResponse.json({ error: 'Missing action or recipie data' }, { status: 500 })
+            const action = formData.get('action')
+            const recipieRaw = formData.get('recipie')
+            const file = formData.get('image')
+            const oldImage = formData.get('oldImageLocaltion')
+
+            if (action !== 'add' && action !== 'modify') return badRequest('Unknown action')
+            if (typeof recipieRaw !== 'string' || !recipieRaw) return badRequest('Missing recipie data')
+
+            let json: unknown
+            try {
+                json = JSON.parse(recipieRaw)
+            } catch {
+                return badRequest('Recipie data is not valid JSON')
             }
-            
-           if (file) {
-                  console.log('Processing file upload')
-                  const bytes = await file.arrayBuffer();
-                  const buffer = Buffer.from(bytes);
-                  const recipieObj = JSON.parse(recipie);
-                  console.log('recipe object:', recipieObj);
-                  const imagePath = `${uploadDir}/${recipieObj.image}`;
-                  console.log('image path:', imagePath);
-                  await writeFile(imagePath, buffer);
-                  console.log(oldImage)
-                  if (oldImage) {
-                      const oldImagePath = `${uploadDir}/${oldImage}`;
-                      await unlink(oldImagePath);
-                  }
-                  console.log('File upload complete')
-              }
-            
-            switch (action) {
-                 case 'add':
-                     console.log('Adding recipe')
-                     return await addRecipie(JSON.parse(recipie));
-                 case 'modify':
-                     console.log('Modifying recipe')
-                     return await modifyRecipie(JSON.parse(recipie) as recipie);
-                 default:
-                     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
-             }
-        } else {
-            data = await req.json();
-            const action = data.action
-            const recipie = data.id
-            
-            if (!action || !recipie) {
-                return NextResponse.json({ error: 'Missing action or id data' }, { status: 500 })
+            const parsed = recipieBody.safeParse(json)
+            if (!parsed.success) return badRequest(`Invalid recipie: ${describeIssues(parsed.error)}`)
+            const recipie = parsed.data
+
+            if (action === 'modify' && !isValidObjectId(recipie._id)) return badRequest('Missing or invalid recipie id')
+
+            // Only touch the disk once the request is known to be valid
+            const hasUpload = !!file && typeof file !== 'string' && file.size > 0 && !!recipie.image
+            if (hasUpload) {
+                await writeFile(imagePath(recipie.image), Buffer.from(await file.arrayBuffer()))
             }
-            
-            switch (action) {
-                case 'delete':
-                    return await deleteRecipie(recipie);
-            }
+
+            if (action === 'add') return await addRecipie(recipie)
+            return await modifyRecipie(recipie, hasUpload && typeof oldImage === 'string' ? oldImage : '')
         }
-        
-        return NextResponse.json({ error: 'Unknown request format' }, { status: 400 })
+
+        const data = await req.json()
+        if (data?.action !== 'delete') return badRequest('Unknown action')
+        if (!isValidObjectId(data.id)) return badRequest('Missing or invalid id')
+        return await deleteRecipie(data.id)
     } catch (err) {
+        console.error('POST /api/recipie failed:', err)
         return NextResponse.json({ error: `Failed to process the request: ${err}` }, { status: 500 })
     }
 }
 
 export async function GET() {
-    return await getRecipies();
+    try {
+        await connectMongoRecipies()
+        // lean() returns documents exactly as stored, independent of schema changes
+        const recipies = await Recipie.find({}).lean()
+        return NextResponse.json(recipies)
+    } catch (err) {
+        console.error('GET /api/recipie failed:', err)
+        return NextResponse.json({ error: `Failed to load recipes: ${err}` }, { status: 500 })
+    }
 }
 
 // POST: Add
-async function addRecipie(recipieToAdd: any) {
-    console.log("here")
-    console.log(recipieToAdd)
-    console.log('Connecting to DB')
-    const db = await connectMongoRecipies()
-    console.log('Connected to DB')
-    console.log('Sending')
-    const sendJSON = recipieToAdd
-    const key: string = "_id"
-    delete sendJSON[key]
-    const recipie = await Recipie.create(sendJSON)
-    console.log('Sent')
-    db.connection.close()
+async function addRecipie(recipieToAdd: RecipieBody) {
+    await connectMongoRecipies()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _id, ...fields } = recipieToAdd
+    const recipie = await Recipie.create(fields)
     return NextResponse.json(
         { message: 'Recipie added successfully', data: recipie },
         { status: 201 }
     )
 }
 
-// GET: Get
-async function getRecipies() {
-    console.log('Connecting to DB');
-    const db = await connectMongoRecipies()
-    console.log('Connected to DB');
-    console.log('Getting recipies');
-    const recipie = await Recipie.find({})
-    console.log('Got recipies');
-    db.connection.close();
-    const formatted: Array<recipie> = recipie;
+// POST: Modify
+async function modifyRecipie(modRecipie: RecipieBody, replacedImage: string) {
+    await connectMongoRecipies()
+    const { _id, ...fields } = modRecipie
+    const recipie = await Recipie.findByIdAndUpdate(_id, fields, { new: true, runValidators: true })
+    if (!recipie) return notFound()
 
-    return NextResponse.json(formatted)
-}
-
-// // POST: Modify
-async function modifyRecipie(modRecipie: recipie) {
-
-    console.log('Connecting to DB')
-    const db = await connectMongoRecipies()
-    console.log('Connected to DB')
-    console.log('Getting')
-    const recipie = await Recipie.findByIdAndUpdate(modRecipie._id, modRecipie, { new: true })
-    console.log('Got')
-    db.connection.close()
-    return NextResponse.json(
-        { message: 'Recipie modified successfully', data: recipie },
-        { status: 201 }
-    )
-}
-
-// DELETE: Remove
-async function deleteRecipie(recipieId: string) {
-    console.log('Connecting to DB')
-    const db = await connectMongoRecipies()
-    console.log('Connected to DB')
-    console.log('Removing')
-    const recipie = await Recipie.findByIdAndDelete(recipieId)
-    console.log('Removed')
-    db.connection.close()
-
-    if (!recipie) {
-        return NextResponse.json({ error: 'Recipe not found' }, { status: 404 })
+    if (replacedImage && replacedImage !== recipie.image) {
+        await removeImageIfUnused(replacedImage)
     }
+    return NextResponse.json({ message: 'Recipie modified successfully', data: recipie })
+}
 
+// POST: Delete
+async function deleteRecipie(recipieId: string) {
+    await connectMongoRecipies()
+    const recipie = await Recipie.findByIdAndDelete(recipieId)
+    if (!recipie) return notFound()
+
+    await removeImageIfUnused(recipie.image)
     return NextResponse.json({ message: 'Recipe deleted successfully', data: recipie })
 }

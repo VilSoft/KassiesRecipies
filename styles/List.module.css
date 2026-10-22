@@ -108,6 +108,50 @@
   border-radius: 999px;
 }
 
+/* Loading skeleton row */
+.skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.skeleton::after {
+  display: none;
+}
+
+/* Recipe without a photo */
+.imagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary) / 0.6);
+  background: hsl(var(--primary) / 0.1);
+}
+
+/* Empty / error state card */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  background: hsl(var(--card) / 0.72);
+  border: 1px solid hsl(var(--card-edge));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+}
+
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 4px;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .container { padding: 0 12px 24px; }

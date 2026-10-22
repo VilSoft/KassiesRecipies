@@ -146,9 +146,9 @@ The app will be available at `http://localhost:3000` on your Raspberry Pi.
 
 ## Environment Variables
 
-Make sure to configure the following environment variables in your `.env.local` file:
+All optional — the app runs with no configuration. Set in `.env.local` (dev) or the container environment:
 
-- `MONGODB_URI`: MongoDB connection string (e.g., `mongodb://localhost:27017/yourdb`).
+- `RECIPES_MONGO_URI`: MongoDB connection string. Defaults to `mongodb://localhost:27017/recipies`.
 
 ## Conclusion
 

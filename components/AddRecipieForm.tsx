@@ -31,6 +31,7 @@ import { z } from "zod"
 import { zodResolver } from '@hookform/resolvers/zod'
 import toGrams from './Converter'
 import { setAddRecipieIsOpen } from '@/redux/features/recipieListSlice'
+import { useToast } from './Toast'
 
 interface AddProps {
     conversions: Array<conversion>
@@ -49,6 +50,7 @@ function AddRecipieForm({ conversions } : AddProps) {
     const [error, setError] = useState<number>(0);
     const [forceRefresh, setForceRefresh] = useState<boolean>(false);
     const [image, setImage] = useState<File | null>(null);
+    const toast = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -180,17 +182,21 @@ function AddRecipieForm({ conversions } : AddProps) {
             body: formData
         }).then(async (res) => {
             // Error handling and closing dialog
-            if (res.status === 201) {
+            if (res.ok) {
                 const data = await res.json();
                 dispatch(addRecipie(data.data));
                 dispatch(setAddRecipieIsOpen(false));
+                toast(`Added "${values.name}"`);
             } else {
-                setError(error + 1);
-                if (error >= 2) {
-                    setTimeout(() => {
-                        dispatch(setAddRecipieIsOpen(false));
-                    }, 1000)
-                }
+                throw new Error(`Add responded ${res.status}`);
+            }
+        }).catch(() => {
+            toast("Couldn't save the recipe.", 'error');
+            setError(error + 1);
+            if (error >= 2) {
+                setTimeout(() => {
+                    dispatch(setAddRecipieIsOpen(false));
+                }, 1000)
             }
         })
     }

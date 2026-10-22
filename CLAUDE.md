@@ -93,9 +93,12 @@ POST body uses `action: 'add' | 'modify' | 'delete'`. Add/modify use `multipart/
 ```
 
 ## MongoDB Notes
-- Connection: `mongodb://localhost:27017/recipies` (hardcoded, IPv4 forced)
-- Each API call opens and closes its own connection (no pooling)
-- Models: `Recipie`, `Conversion`
+- Connection: `mongodb://localhost:27017/recipies` by default (IPv4 forced); override with `RECIPES_MONGO_URI`. Not `MONGO_URI` — that name held a placeholder in docker-compose and must not be honored.
+- One cached connection per process (`globalThis`), never closed per request
+- Models: `Recipie`, `Conversion`. GET routes use `.lean()` so reads return documents exactly as stored — keep that; live data may predate current schema fields
+- Server-side validation in `interfaces/zServer.ts` (separate from, and looser than, the form schemas)
+- Status codes: add → 201, modify/delete → 200, bad input → 400, missing → 404. Frontend checks `res.ok`
+- Uploaded images are deleted when no recipe references them anymore (`utils/uploads.ts`)
 
 ## Important Rules
 - **Do not modify** Redux store shape, API routes, Zod schemas, or React Hook Form logic without explicit request

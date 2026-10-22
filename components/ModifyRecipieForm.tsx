@@ -30,6 +30,7 @@ import { AlertCircle } from 'lucide-react'
 import { z } from "zod"
 import { zodResolver } from '@hookform/resolvers/zod'
 import toGrams from './Converter'
+import { useToast } from './Toast'
 
 interface AddProps {
     setModMode: React.Dispatch<React.SetStateAction<boolean>>,
@@ -51,6 +52,7 @@ function AddRecipieForm({ conversions, setModMode, recipie, setRecipie } : AddPr
     const [error, setError] = useState<number>(0);
     const [forceRefresh, setForceRefresh] = useState<boolean>(false);
     const [image, setImage] = useState<File | null>(null);
+    const toast = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -173,19 +175,22 @@ function AddRecipieForm({ conversions, setModMode, recipie, setRecipie } : AddPr
             body: formData
         }).then(async (res) => {
             // Error handling and closing dialog
-            if (res.status === 201) {
+            if (res.ok) {
                 const data = await res.json();
-                // TODO
                 dispatch(modifyRecipie(data.data));
                 setRecipie(data.data);
                 setModMode(false);
+                toast('Changes saved');
             } else {
-                setError(error + 1);
-                if (error >= 2) {
-                    setTimeout(() => {
-                        setModMode(false);
-                    }, 1000)
-                }
+                throw new Error(`Modify responded ${res.status}`);
+            }
+        }).catch(() => {
+            toast("Couldn't save your changes.", 'error');
+            setError(error + 1);
+            if (error >= 2) {
+                setTimeout(() => {
+                    setModMode(false);
+                }, 1000)
             }
         })
     }

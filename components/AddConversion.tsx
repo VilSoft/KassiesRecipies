@@ -26,6 +26,7 @@ import { ArrowBigDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { conversion } from '@/interfaces';
 import { setAddConversionIsOpen } from '@/redux/features/recipieListSlice';
+import { useToast } from './Toast';
 
 // const errMsgs: string[] = ["An error has occured on the server", "Too many errors occuring, try again later"]
 
@@ -42,6 +43,7 @@ function AddConversion() {
     })
 
     const [error, setError] = useState<number>(0);
+    const toast = useToast();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         if (values.toGrams != 1) {
@@ -64,17 +66,21 @@ function AddConversion() {
             body: JSON.stringify({action: 'add', conversion})
         }).then(async (res) => {
             // Error handling and closing dialog
-            if (res.status === 201) {
+            if (res.ok) {
                 const data = await res.json();
                 dispatch(addConversion(data.data));
-                setAddConversionIsOpen(false);
+                dispatch(setAddConversionIsOpen(false));
+                toast(`Added conversion for ${conversion.name}`);
             } else {
-                setError(error + 1);
-                if (error >= 2) {
-                    setTimeout(() => {
-                        setAddConversionIsOpen(false);
-                    }, 1000)
-                }
+                throw new Error(`Add conversion responded ${res.status}`);
+            }
+        }).catch(() => {
+            toast("Couldn't save the conversion.", 'error');
+            setError(error + 1);
+            if (error >= 2) {
+                setTimeout(() => {
+                    dispatch(setAddConversionIsOpen(false));
+                }, 1000)
             }
         })
     }

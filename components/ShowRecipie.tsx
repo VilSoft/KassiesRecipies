@@ -10,6 +10,7 @@ import { conversion } from '@/interfaces'
 import { useAppDispatch } from '@/redux/store'
 import { deleteRecipie } from '@/redux/features/recipieSlice'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { useToast } from './Toast'
 
 interface RecipieProp {
     recipie: recipie,
@@ -25,6 +26,8 @@ function ShowRecipie({ recipie, conversions }: RecipieProp) {
   const [modMode, setModMode] = useState<boolean>(false);
   const [recipieHere, setRecipie] = useState<recipie>(recipie);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const toast = useToast();
 
   const handleModify = () => {
     setModMode(true);
@@ -35,13 +38,23 @@ function ShowRecipie({ recipie, conversions }: RecipieProp) {
   }
 
   const confirmDelete = async () => {
-    await fetch('/api/recipie', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete', id: recipieHere._id })
-    })
-    dispatch(deleteRecipie(recipieHere._id))
-    setShowDeleteDialog(false)
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/recipie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id: recipieHere._id })
+      })
+      if (!res.ok) throw new Error(`Delete responded ${res.status}`)
+      // Only drop it locally once the server confirms
+      setShowDeleteDialog(false)
+      dispatch(deleteRecipie(recipieHere._id))
+      toast(`Deleted "${recipieHere.name}"`)
+    } catch {
+      toast("Couldn't delete the recipe. Try again.", 'error')
+    } finally {
+      setDeleting(false)
+    }
   }
 
 if (modMode) {
@@ -53,7 +66,7 @@ if (modMode) {
       return (
       <>
         <div className={style['recipe-view']}>
-          {recipieHere.image !== "" && (
+          {recipieHere.image && (
             <Image width={0} height={0} sizes='100vw' src={`/api/uploads/${recipieHere.image}`} alt={recipieHere.image} className={style.image} />
           )}
 
@@ -118,8 +131,8 @@ if (modMode) {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-               <Button variant="outline" className="form-cancel-btn" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-               <Button variant="destructive" className="btn-primary" onClick={confirmDelete}>Delete</Button>
+               <Button variant="outline" className="form-cancel-btn" onClick={() => setShowDeleteDialog(false)} disabled={deleting}>Cancel</Button>
+               <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Deleting…' : 'Delete'}</Button>
              </DialogFooter>
           </DialogContent>
         </Dialog>

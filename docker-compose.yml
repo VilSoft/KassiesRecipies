@@ -7,8 +7,9 @@ services:
     container_name: kassiesrecipies
     restart: unless-stopped
     network_mode: host
-    environment:
-      MONGO_URI: mongodb://admin:STRONG_PASSWORD_HERE@localhost:27017/mydatabase?authSource=admin
+    # The app defaults to mongodb://localhost:27017/recipies. Uncomment to override.
+    # environment:
+    #   RECIPES_MONGO_URI: mongodb://localhost:27017/recipies
     volumes:
       - /home/kai/KassiesRecipies/uploads:/app/uploads
     healthcheck:
