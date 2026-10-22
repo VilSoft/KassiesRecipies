@@ -12,9 +12,9 @@
 /* Recipe List Item */
 .list {
   cursor: pointer;
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius);
+  background: hsl(var(--card) / 0.72);
+  border: 1px solid hsl(var(--card-edge));
+  border-radius: var(--radius-lg);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -23,13 +23,14 @@
   position: relative;
   color: hsl(var(--foreground));
   box-shadow: var(--shadow-xs);
-  transition: box-shadow 200ms ease, border-color 200ms ease;
+  transition: box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
   list-style: none;
 }
 
 .list:hover {
+  background: hsl(var(--card) / 0.9);
   box-shadow: var(--shadow-hover);
-  border-color: hsl(24 95% 53% / 0.35);
+  border-color: hsl(var(--primary) / 0.45);
 }
 
 /* Chevron affordance */
@@ -77,13 +78,13 @@
 }
 
 .list:hover .recipeName {
-  color: hsl(var(--accent));
+  color: hsl(var(--primary));
 }
 
 /* Add Button */
 .add-button {
-  background: hsl(var(--accent));
-  color: hsl(var(--accent-foreground));
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
   border-radius: var(--radius);
   padding: 10px 20px;
   font-size: 0.875rem;
@@ -94,7 +95,7 @@
 }
 
 .add-button:hover {
-  background: hsl(21 90% 48%);
+  background: hsl(var(--primary) / 0.9);
 }
 
 /* Recipe Count */

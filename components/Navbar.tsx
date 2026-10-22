@@ -21,12 +21,8 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        const root = window.document.documentElement;
-        const theme = localStorage.getItem("theme");
-        if (theme === "dark") {
-            root.classList.add("dark");
-            setIsDarkmode(true);
-        }
+        // Theme class is applied pre-hydration by the inline script in app/layout.tsx
+        setIsDarkmode(window.document.documentElement.classList.contains("dark"));
     }, [])
 
     const toggleTheme = () => {
@@ -45,12 +41,12 @@ export default function Navbar() {
     }
 
      return (
-        <nav className="w-full border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-40">
+        <nav className="w-full glass-nav sticky top-0 z-40">
             <div className="flex items-center justify-between max-w-2xl mx-auto px-4 py-3 gap-3">
                 <NavigationMenu>
                     <NavigationMenuList>
                       <NavigationMenuItem>
-                            <div className="text-xl font-bold tracking-tight text-foreground">
+                            <div className="text-xl brand-title">
                                 Kassie&apos;s Recipes
                             </div>
                         </NavigationMenuItem>
@@ -64,7 +60,7 @@ export default function Navbar() {
                 </div>
             </div>
             {isOpen &&
-                <div className="border-t border-border bg-background/95 max-w-2xl mx-auto px-4 py-2 flex flex-wrap items-center gap-2">
+                <div className="border-t border-[hsl(var(--card-edge))] max-w-2xl mx-auto px-4 py-2 flex flex-wrap items-center gap-2">
                     <Input type="text" className="search-input sm:hidden w-full mb-1" placeholder="Search recipes..." onChange={(e) => dispatch(setSearchParam(e.target.value))} />
                     <div className="flex items-center gap-2 ml-auto">
                         <Button onClick={() => dispatch(setAddRecipieIsOpen(true))} className="btn-primary h-9 text-sm">Add Recipe</Button>

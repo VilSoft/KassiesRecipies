@@ -331,7 +331,7 @@ function AddRecipieForm({ conversions, setModMode, recipie, setRecipie } : AddPr
                                             <label className={style.label}>{i + 1}:
                                                 <textarea 
                                                     {...form.register(`instructions.${i}.value` as const)}
-                                                    className="block w-full !resize-none overflow-hidden rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent "
+                                                    className="block w-full !resize-none overflow-hidden rounded-md border border-input p-2 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent "
                                                     rows={1}
                                                     onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInstrInput(e)}
                                                     placeholder=''

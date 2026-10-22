@@ -39,19 +39,24 @@ Kassies Recipes is a full-stack application with TypeScript, React, and Node.js.
 - lucide-react icons
 
 ## Design System
-Single accent: `orange-500` (#f97316). No gradients, no glassmorphism.
+Mirrors the sibling **homeauto** dashboard (`../homeauto/styles/globals.css`). Brand color is indigo `--primary` (`243 75% 59%` light / `243 75% 65%` dark). `--accent` is a neutral hover surface (shadcn semantics) — never use it as the brand color. Inter font via `next/font` (`--font-inter`, `font-sans`).
 
-**CSS variables** (defined in `app/globals.css` @layer base):
-- `--background`, `--foreground`, `--card`, `--border`, `--muted`, `--muted-foreground`
-- `--accent` (orange-500), `--accent-foreground`
-- `--destructive`, `--destructive-foreground`
-- `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-hover`
-- `--radius: 0.625rem`
+**CSS variables** (defined in `app/globals.css` @layer base, HSL triplets):
+- `--background`, `--foreground`, `--foreground-muted`, `--foreground-subtle`, `--surface`, `--surface-raised`
+- `--card`, `--card-border`, `--card-edge` (full color incl. alpha — use `hsl(var(--card-edge))` only, no `/ alpha`), `--card-shadow`
+- `--primary` (indigo), `--primary-foreground`, `--ring` (indigo)
+- `--muted`, `--muted-foreground`, `--accent` (neutral), `--destructive`, `--success`
+- `--nav-bg`, `--blob-opacity`
+- `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-hover` (primary glow)
+- `--radius: 0.75rem`, `--radius-sm`, `--radius-lg`, `--radius-xl`
 
-**Light mode**: `#FCFCFC` background, slate-900 foreground, slate-200 borders
-**Dark mode**: `#0B0F1A` background, slate-50 foreground — toggled via `.dark` class on `<html>`
+CSS Modules reference `hsl(var(--primary) / x)` — no hardcoded color literals.
 
-**Global utility classes** in `globals.css`: `.section-label`, `.action-btn`, `.btn-primary`, `.btn-ghost`, `.search-input`, `.recipe-card-clean`, `.fade-up`
+**Dark mode (default)**: near-black navy `230 40% 3%`. Light mode only when user picks it (`localStorage.theme === 'light'`). Toggled via `.dark` class on `<html>`.
+
+**Global utility classes** in `globals.css`: `.section-label`, `.action-btn`, `.btn-primary`, `.btn-ghost`, `.search-input`, `.recipe-card-clean`, `.fade-up`, `.bg-blobs` / `.bg-blob-1..3` (drifting radial background in `Layout.tsx`), `.brand-title` (gradient wordmark), `.glass-nav` (blurred navbar)
+
+**Cards**: translucent `hsl(var(--card) / 0.72–0.82)`, subtle edge border, hover → `--primary / 0.45` border + glow.
 
 **Theme persistence**: FOUC-free via inline blocking script in `<head>` that reads `localStorage` before React hydrates.
 
@@ -97,5 +102,5 @@ POST body uses `action: 'add' | 'modify' | 'delete'`. Add/modify use `multipart/
 - **Do not wrap** Radix Dialog/Modal with Framer `AnimatePresence` — Radix controls mount/unmount internally
 - **Textarea auto-resize** logic (`scrollHeight`) in form components must be preserved
 - **`onInteractOutside` prevention** in `Modal.tsx` is intentional — modals are non-dismissible by backdrop click
-- All focus rings use orange (`hsl(var(--accent))`), never purple
+- All focus rings use indigo (`hsl(var(--ring))` / `--primary`)
 - Dark mode overrides via CSS variable inheritance — no `html:global(.dark)` selectors needed in CSS Modules

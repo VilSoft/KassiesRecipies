@@ -9,19 +9,32 @@ export default {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-inter)', 'system-ui', 'sans-serif']
+  		},
+  		boxShadow: {
+  			card: 'var(--card-shadow)',
+  			'glow-sm': '0 0 12px hsl(var(--primary) / 0.2)'
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			surface: 'hsl(var(--surface) / <alpha-value>)',
+  			'surface-raised': 'hsl(var(--surface-raised) / <alpha-value>)',
+  			'foreground-muted': 'hsl(var(--foreground-muted))',
+  			'foreground-subtle': 'hsl(var(--foreground-subtle))',
+  			success: 'hsl(var(--success))',
   			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
+  				DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+  				foreground: 'hsl(var(--card-foreground))',
+  				border: 'hsl(var(--card-border))'
   			},
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
+  				DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {

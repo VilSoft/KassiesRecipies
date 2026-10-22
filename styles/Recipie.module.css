@@ -47,8 +47,8 @@
 
 .batch-select:focus {
   outline: none;
-  border-color: hsl(var(--accent));
-  box-shadow: 0 0 0 3px hsl(24 95% 53% / 0.15);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
 }
 
 /* Action Buttons */
@@ -75,7 +75,7 @@
   padding: 10px 14px;
   border-radius: calc(var(--radius) - 2px);
   background: hsl(var(--muted));
-  border-left: 2px solid hsl(24 95% 53% / 0.45);
+  border-left: 2px solid hsl(var(--primary) / 0.45);
 }
 
 /* Ingredient Name */
@@ -113,10 +113,10 @@
 .instruction-number {
   font-size: 0.6875rem;
   font-weight: 700;
-  color: hsl(var(--accent));
+  color: hsl(var(--primary));
   width: 22px;
   height: 22px;
-  background: hsl(24 95% 53% / 0.1);
+  background: hsl(var(--primary) / 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;

@@ -3,66 +3,196 @@
 @tailwind utilities;
 
 @layer base {
+  /* Tokens mirror homeauto (styles/globals.css) */
   :root {
-    --background: 0 0% 99%;
+    --background: 220 14% 96%;
     --foreground: 222 47% 11%;
+
+    --surface: 220 14% 98%;
+    --surface-raised: 0 0% 100%;
+
+    --foreground-muted: 220 9% 46%;
+    --foreground-subtle: 220 9% 63%;
+
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
+    --card-border: 220 13% 91%;
+    --card-edge: 220 13% 88%;
+    --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 0 0% 98%;
+
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+
     --secondary: 220 14% 96%;
     --secondary-foreground: 222 47% 11%;
+
     --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 24 95% 53%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+
+    --success: 142 71% 45%;
+
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 24 95% 53%;
-    --radius: 0.625rem;
+    --ring: 243 75% 59%;
+
+    --nav-bg: 220 14% 96%;
+    --nav-border: 220 13% 91%;
+
+    --blob-opacity: 0.35;
+
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-sm: var(--card-shadow);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
-    --shadow-hover: 0 8px 16px -4px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+    --shadow-hover: 0 0 14px hsl(var(--primary) / 0.14);
   }
   .dark {
-    --background: 222 47% 7%;
+    --background: 230 40% 3%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 10%;
+
+    --surface: 228 38% 6%;
+    --surface-raised: 228 35% 9%;
+
+    --foreground-muted: 215 20% 65%;
+    --foreground-subtle: 215 15% 45%;
+
+    --card: 228 38% 9%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 10%;
+    --card-border: 228 30% 20%;
+    --card-edge: 0 0% 100% / 0.07;
+    --card-shadow: 0 8px 32px -4px rgb(0 0 0 / 0.5), 0 2px 8px -2px rgb(0 0 0 / 0.4);
+
+    --popover: 222 47% 7%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
+
+    --primary: 243 75% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 47% 10%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 24 95% 53%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 63% 31%;
+
+    --muted: 222 47% 10%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 222 47% 10%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 24 95% 53%;
+
+    --success: 142 71% 45%;
+
+    --border: 222 30% 16%;
+    --input: 222 30% 16%;
+    --ring: 243 75% 65%;
+
+    --nav-bg: 222 47% 4%;
+    --nav-border: 222 30% 16%;
+
+    --blob-opacity: 1;
+
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-sm: var(--card-shadow);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-    --shadow-hover: 0 8px 16px -4px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-hover: 0 0 14px hsl(var(--primary) / 0.14);
   }
+}
+
+@keyframes blob-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(40px, -28px) scale(1.06); }
+  66%       { transform: translate(-22px, 18px) scale(0.95); }
+}
+@keyframes blob-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-32px, 24px) scale(1.08); }
+  70%       { transform: translate(20px, -16px) scale(0.96); }
+}
+@keyframes blob-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(16px, -30px) scale(1.05); }
 }
 
 @layer base {
   * {
     @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Ambient background blobs (homeauto Layout) */
+.bg-blobs {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  opacity: var(--blob-opacity);
+}
+.bg-blobs > div {
+  position: absolute;
+  will-change: transform;
+}
+.bg-blob-1 {
+  top: -16rem; left: -10rem; width: 52rem; height: 52rem;
+  background: radial-gradient(ellipse at center, hsl(243 75% 38% / 0.28) 0%, transparent 70%);
+  animation: blob-drift-1 22s ease-in-out infinite;
+}
+.bg-blob-2 {
+  top: 5rem; right: -13rem; width: 44rem; height: 44rem;
+  background: radial-gradient(ellipse at center, hsl(210 85% 45% / 0.22) 0%, transparent 70%);
+  animation: blob-drift-2 28s ease-in-out infinite;
+}
+.bg-blob-3 {
+  bottom: -10rem; left: 33%; width: 40rem; height: 40rem;
+  background: radial-gradient(ellipse at center, hsl(270 60% 32% / 0.2) 0%, transparent 70%);
+  animation: blob-drift-3 19s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-blobs > div { animation: none; }
+}
+
+/* Gradient wordmark (homeauto Home.module.css .title) */
+.brand-title {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, hsl(270 70% 65%), hsl(210 85% 55%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark .brand-title {
+  background-image: linear-gradient(135deg, hsl(270 70% 75%), hsl(210 85% 65%));
+}
+
+/* Glass surface (homeauto Nav / QuickLinks section) */
+.glass-nav {
+  background: hsl(var(--nav-bg) / 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid hsl(var(--card-edge));
 }
 
 html {
@@ -70,7 +200,7 @@ html {
 }
 
 ::selection {
-  background: hsl(24 95% 53% / 0.15);
+  background: hsl(var(--primary) / 0.15);
   color: hsl(var(--foreground));
 }
 
@@ -96,13 +226,15 @@ html {
 
 /* Clean card base */
 .recipe-card-clean {
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 200ms ease, transform 200ms ease;
+  background: hsl(var(--card) / 0.82);
+  border: 1px solid hsl(var(--card-edge));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 .recipe-card-clean:hover {
+  background: hsl(var(--card) / 0.9);
+  border-color: hsl(var(--primary) / 0.45);
   box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
@@ -128,8 +260,8 @@ html {
 
 /* Primary button */
 .btn-primary {
-  background: hsl(var(--accent));
-  color: hsl(var(--accent-foreground));
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
   border-radius: var(--radius);
   padding: 10px 20px;
   font-size: 0.875rem;
@@ -139,7 +271,7 @@ html {
   cursor: pointer;
 }
 .btn-primary:hover {
-  background: hsl(21 90% 48%);
+  background: hsl(var(--primary) / 0.9);
   box-shadow: var(--shadow-md);
 }
 .btn-primary:active {
@@ -177,8 +309,8 @@ html {
 }
 .search-input:focus {
   outline: none;
-  border-color: hsl(var(--accent));
-  box-shadow: 0 0 0 3px hsl(24 95% 53% / 0.12);
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
 }
 
 /* One-shot entrance animation */
